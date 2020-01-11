@@ -27,14 +27,14 @@ void loop() {
     float feelsLikeTemp = dht.computeHeatIndex(rawTemp, humidity, false);
 
     Serial.print("Humidity: ");
-    Serial.print(humidity);
+    Serial.print(humidity, 1);
     Serial.print("% | ");
 
     Serial.print("Temperature: ");
-    Serial.print(rawTemp);
+    Serial.print(rawTemp, 1);
     Serial.print("°C | ");
 
     Serial.print("Feels like: ");
-    Serial.print(feelsLikeTemp);
+    Serial.print(feelsLikeTemp, 1);
     Serial.println("°C | ");
 }
