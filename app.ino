@@ -12,21 +12,27 @@ DHT dht(DHTPIN, DHTTYPE);
 // Set the LCD address to 0x27 for a 20 chars and 4 line display
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
+bool lcdBlinking;
+
 void setup() {
     // Sensors
     dht.begin();
 
     // LCD 
     lcd.begin();
-	lcd.backlight();
     lcd.print("Starting...");
     lcd.blink();
+    lcdBlinking = true;
 }
 
 void loop() {
+    
     delay(4000);
+    lcd.clear();
 
-    lcd.noBlink();
+    if(lcdBlinking){
+        lcd.noBlink();
+    }
 
     // Get temperature and humidity
     float humidity = dht.readHumidity();
