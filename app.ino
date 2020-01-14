@@ -46,18 +46,29 @@ void loop() {
     float feelsLikeTemp = dht.computeHeatIndex(rawTemp, humidity, false);
 
     // Print results
-    lcd.home();
+    displayHumidity(humidity, 0);
+    displayrawTemp(rawTemp, 1);
+    displayFeelTemp(feelsLikeTemp, 2);
+
+}
+
+void displayHumidity(float humidity, int row){
+    lcd.setCursor(0, row);
     lcd.print("Humidity: ");
     lcd.print(humidity, 1);
     lcd.print("%");
+}
 
-    lcd.setCursor(0, 1);
+void displayrawTemp(float rawTemp, int row){
+    lcd.setCursor(0, row);
     lcd.print("Temp: ");
     lcd.print(rawTemp, 1);
     lcd.print((char)223);
     lcd.print("C");
+}
 
-    lcd.setCursor(0, 2);
+void displayFeelTemp(float feelsLikeTemp, int row){
+    lcd.setCursor(0, row);
     lcd.print("Feels like: ");
     lcd.print(feelsLikeTemp, 1);
     lcd.print((char)223);
