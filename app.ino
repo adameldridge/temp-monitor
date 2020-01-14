@@ -37,19 +37,26 @@ void loop() {
     // Get temperature and humidity
     float humidity = dht.readHumidity();
     float rawTemp = dht.readTemperature();
+    float feelsLikeTemp = dht.computeHeatIndex(rawTemp, humidity, false);
     
-    if (isnan(humidity) || isnan(rawTemp)) {
-        Serial.println(F("Error reading from sensor"));
+    if (isnan(humidity) || isnan(rawTemp) || isnan(feelsLikeTemp)) {
+        displayError("Bad sensor reading");
         return;
     }
-
-    float feelsLikeTemp = dht.computeHeatIndex(rawTemp, humidity, false);
 
     // Print results
     displayHumidity(humidity, 0);
     displayrawTemp(rawTemp, 1);
     displayFeelTemp(feelsLikeTemp, 2);
 
+}
+
+void displayError(String errorMsg){
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Error:");
+    lcd.setCursor(0, 1);
+    lcd.print(errorMsg);
 }
 
 void displayHumidity(float humidity, int row){
