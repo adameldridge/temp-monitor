@@ -12,7 +12,7 @@ DHT dht(DHTPIN, DHTTYPE);
 // Set the LCD address to 0x27 for a 20 chars and 4 line display
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
-bool lcdBlinking;
+bool firstRun;
 
 void setup() {
     // Sensors
@@ -22,33 +22,79 @@ void setup() {
     lcd.begin();
     lcd.print("Starting...");
     lcd.blink();
-    lcdBlinking = true;
+    firstRun = true;
 }
 
 void loop() {
     
     delay(4000);
-    lcd.clear();
 
-    if(lcdBlinking){
-        lcd.noBlink();
-    }
 
     // Get temperature and humidity
     float humidity = dht.readHumidity();
-    float rawTemp = dht.readTemperature();
-    float feelsLikeTemp = dht.computeHeatIndex(rawTemp, humidity, false);
+    float currentTemp = dht.readTemperature();
     
-    if (isnan(humidity) || isnan(rawTemp) || isnan(feelsLikeTemp)) {
+    if (isnan(humidity) || isnan(currentTemp)) {
         displayError("Bad sensor reading");
         return;
     }
 
-    // Print results
-    displayHumidity(humidity, 0);
-    displayrawTemp(rawTemp, 1);
-    displayFeelTemp(feelsLikeTemp, 2);
+    // Set min and max temps
+    float maxTemp;
+    float minTemp;
 
+    if(currentTemp > maxTemp || firstRun){
+        maxTemp = currentTemp;
+    }
+
+    if(currentTemp < minTemp || firstRun){
+        minTemp = currentTemp;
+    }
+
+    // Handle first run of loop
+    if(firstRun){
+        lcd.noBlink();
+        lcd.clear();
+        firstRun = false;
+    }
+
+    // Print results
+    displayCurrentTemp(currentTemp, 0);
+    displayMinTemp(minTemp, 1);
+    displayMaxTemp(maxTemp, 2);
+    displayHumidity(humidity, 3);
+}
+
+void displayCurrentTemp(float currentTemp, int row){
+    lcd.setCursor(0, row);
+    lcd.print("Cur Temp: ");
+    lcd.print(currentTemp, 1);
+    lcd.print((char)223);
+    lcd.print("C");
+}
+
+void displayMinTemp(float minTemp, int row){
+    lcd.setCursor(0, row);
+    lcd.print("Min Temp: ");
+    lcd.print(minTemp, 1);
+    lcd.print((char)223);
+    lcd.print("C ");
+
+}
+
+void displayMaxTemp(float maxTemp, int row){
+    lcd.setCursor(0, row);
+    lcd.print("Max Temp: ");
+    lcd.print(maxTemp, 1);
+    lcd.print((char)223);
+    lcd.print("C");
+}
+
+void displayHumidity(float humidity, int row){
+    lcd.setCursor(0, row);
+    lcd.print("Humidity: ");
+    lcd.print(humidity, 1);
+    lcd.print("%");
 }
 
 void displayError(String errorMsg){
@@ -59,25 +105,3 @@ void displayError(String errorMsg){
     lcd.print(errorMsg);
 }
 
-void displayHumidity(float humidity, int row){
-    lcd.setCursor(0, row);
-    lcd.print("Humidity: ");
-    lcd.print(humidity, 1);
-    lcd.print("%");
-}
-
-void displayrawTemp(float rawTemp, int row){
-    lcd.setCursor(0, row);
-    lcd.print("Temp: ");
-    lcd.print(rawTemp, 1);
-    lcd.print((char)223);
-    lcd.print("C");
-}
-
-void displayFeelTemp(float feelsLikeTemp, int row){
-    lcd.setCursor(0, row);
-    lcd.print("Feels like: ");
-    lcd.print(feelsLikeTemp, 1);
-    lcd.print((char)223);
-    lcd.print("C");
-}
